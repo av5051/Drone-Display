@@ -1,121 +1,76 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
+import { useTelemetry } from './layers/data/useTelemetry';
+import { useDroneStore } from './store/droneStore';
+import { TelemetryCard } from './layers/ui/TelemetryCard';
+import { StatusBar } from './layers/ui/StatusBar';
+import { FlightControls } from './layers/control/FlightControls';
+import { ModeSelector } from './layers/control/ModeSelector';
+import { GPSCard } from './layers/ui/GPSCard';
+
+// ... imports stay the same
 
 function App() {
-  const [count, setCount] = useState(0)
+  useTelemetry();
+  const t = useDroneStore((state) => state.telemetry);
 
   return (
-    <>
-      <section id="center">
-        <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
-        </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.jsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
+    <div className="min-h-screen bg-black text-green-500 p-6">
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <header className="flex justify-between items-end border-b border-green-900/40 pb-4 mb-8">
+          <div>
+            <h1 className="text-2xl font-black tracking-widest uppercase italic">
+              Nav_System <span className="text-white text-lg">v1.0</span>
+            </h1>
+            <p className="text-[10px] text-green-900 font-bold uppercase tracking-[0.3em]">
+              SITL Connection Active
+            </p>
+          </div>
+          <StatusBar />
+        </header>
 
-      <div className="ticks"></div>
-
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+        {/* Metrics */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <TelemetryCard label="Altitude" value={t.alt} unit="M" />
+          <TelemetryCard label="Airspeed" value={t.airspeed} unit="M/S" />
+          <TelemetryCard label="Heading" value={t.heading} unit="DEG" />
+          <TelemetryCard label="Battery" value={t.battery} unit="%" color={t.battery < 20 ? 'text-red-500' : 'text-green-400'} />
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
-        </div>
-      </section>
 
-      <div className="ticks"></div>
-      <section id="spacer"></section>
-    </>
-  )
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Controls Section */}
+          <div className="lg:col-span-1">
+            <section className="bg-black border border-green-900/30 p-6 rounded-none shadow-none">
+              <h2 className="text-[10px] font-bold text-green-900 mb-4 uppercase tracking-widest">Command_Center</h2>
+              <FlightControls />
+              <div className="mt-6 pt-6 border-t border-green-900/20">
+                <p className="text-[10px] text-green-900 mb-3 uppercase tracking-widest">Flight_Modes</p>
+                <ModeSelector />
+              </div>
+            </section>
+          </div>
+
+          {/* Data Section */}
+          <div className="lg:col-span-2 space-y-6">
+            {/* GPSCard should now be bg-black in its own file, 
+                but we ensure the container here is black too */}
+            <div className="bg-black border border-green-900/30">
+               <GPSCard />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-black border border-green-900/30 p-4">
+                <p className="text-[10px] text-green-900 uppercase font-bold tracking-tighter">Pitch_Axis</p>
+                <p className="text-xl font-mono text-white">{t.pitch ?? '0.0'}°</p>
+              </div>
+              <div className="bg-black border border-green-900/30 p-4">
+                <p className="text-[10px] text-green-900 uppercase font-bold tracking-tighter">Roll_Axis</p>
+                <p className="text-xl font-mono text-white">{t.roll ?? '0.0'}°</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
-
-export default App
+export default App;
