@@ -1,76 +1,95 @@
+import React from 'react';
 import { useTelemetry } from './layers/data/useTelemetry';
 import { useDroneStore } from './store/droneStore';
+
+// UI Components
 import { TelemetryCard } from './layers/ui/TelemetryCard';
 import { StatusBar } from './layers/ui/StatusBar';
+import { GPSCard } from './layers/ui/GPSCard';
+import { NotificationFeed } from './layers/ui/NotificationFeed';
+
+// Control Components
 import { FlightControls } from './layers/control/FlightControls';
 import { ModeSelector } from './layers/control/ModeSelector';
-import { GPSCard } from './layers/ui/GPSCard';
 
-// ... imports stay the same
+// ... existing imports
 
 function App() {
   useTelemetry();
   const t = useDroneStore((state) => state.telemetry);
 
   return (
-    <div className="min-h-screen bg-black text-green-500 p-6">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <header className="flex justify-between items-end border-b border-green-900/40 pb-4 mb-8">
+    <div className="min-h-screen bg-black text-green-500 p-8 font-mono">
+      <div className="max-w-7xl mx-auto">
+        
+        <header className="flex justify-between items-end border-b border-green-900/40 pb-6 mb-10">
           <div>
-            <h1 className="text-2xl font-black tracking-widest uppercase italic">
-              Nav_System <span className="text-white text-lg">v1.0</span>
+            <h1 className="text-3xl font-black tracking-widest uppercase italic">
+              NAV_SYSTEM <span className="text-white text-xl">V1.0</span>
             </h1>
-            <p className="text-[10px] text-green-900 font-bold uppercase tracking-[0.3em]">
-              SITL Connection Active
+            <p className="text-xs text-green-900 font-bold uppercase tracking-[0.3em] mt-1">
+              SITL_ACTIVE_SESSION
             </p>
           </div>
           <StatusBar />
         </header>
 
-        {/* Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+        {/* Primary Metrics: Increased padding and text size */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-8">
           <TelemetryCard label="Altitude" value={t.alt} unit="M" />
           <TelemetryCard label="Airspeed" value={t.airspeed} unit="M/S" />
           <TelemetryCard label="Heading" value={t.heading} unit="DEG" />
           <TelemetryCard label="Battery" value={t.battery} unit="%" color={t.battery < 20 ? 'text-red-500' : 'text-green-400'} />
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
-          {/* Controls Section */}
-          <div className="lg:col-span-1">
-            <section className="bg-black border border-green-900/30 p-6 rounded-none shadow-none">
-              <h2 className="text-[10px] font-bold text-green-900 mb-4 uppercase tracking-widest">Command_Center</h2>
+        <div className="grid lg:grid-cols-12 gap-8">
+          
+          {/* Left Column: Commands (Span 4) */}
+          <div className="lg:col-span-4 space-y-8">
+            <section className="bg-black border border-green-900/30 p-8">
+              <h2 className="text-xs font-bold text-green-900 mb-6 uppercase tracking-widest border-b border-green-900/20 pb-3">
+                Command_Center
+              </h2>
               <FlightControls />
-              <div className="mt-6 pt-6 border-t border-green-900/20">
-                <p className="text-[10px] text-green-900 mb-3 uppercase tracking-widest">Flight_Modes</p>
+              
+              <div className="mt-10 pt-8 border-t border-green-900/20">
+                <p className="text-xs text-green-900 mb-4 uppercase tracking-widest font-bold">
+                  Flight_Mode_Selection
+                </p>
                 <ModeSelector />
               </div>
             </section>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-black border border-green-900/30 p-5 text-center">
+                <p className="text-xs text-green-900 uppercase font-bold mb-2">Pitch</p>
+                <p className="text-2xl font-mono text-white">{t.pitch?.toFixed(1) ?? '0.0'}°</p>
+              </div>
+              <div className="bg-black border border-green-900/30 p-5 text-center">
+                <p className="text-xs text-green-900 uppercase font-bold mb-2">Roll</p>
+                <p className="text-2xl font-mono text-white">{t.roll?.toFixed(1) ?? '0.0'}°</p>
+              </div>
+            </div>
           </div>
 
-          {/* Data Section */}
-          <div className="lg:col-span-2 space-y-6">
-            {/* GPSCard should now be bg-black in its own file, 
-                but we ensure the container here is black too */}
-            <div className="bg-black border border-green-900/30">
-               <GPSCard />
+          {/* Right Column: GPS & Large Terminal (Span 8) */}
+          <div className="lg:col-span-8 space-y-8">
+            <GPSCard />
+            
+            {/* Terminal height increased to 250px */}
+            <div className="h-[250px]">
+               <NotificationFeed />
             </div>
             
-            <div className="grid grid-cols-2 gap-4">
-              <div className="bg-black border border-green-900/30 p-4">
-                <p className="text-[10px] text-green-900 uppercase font-bold tracking-tighter">Pitch_Axis</p>
-                <p className="text-xl font-mono text-white">{t.pitch ?? '0.0'}°</p>
-              </div>
-              <div className="bg-black border border-green-900/30 p-4">
-                <p className="text-[10px] text-green-900 uppercase font-bold tracking-tighter">Roll_Axis</p>
-                <p className="text-xl font-mono text-white">{t.roll ?? '0.0'}°</p>
-              </div>
+            <div className="bg-green-900/5 p-4 border border-green-900/10 text-xs text-green-900 uppercase tracking-[0.15em] text-center">
+              System_Status: Nominal // MAVLink_Protocol: v2.0 // SITL_Link: Stable
             </div>
           </div>
+
         </div>
       </div>
     </div>
   );
 }
+
 export default App;
