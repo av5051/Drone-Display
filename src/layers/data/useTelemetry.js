@@ -26,5 +26,5 @@ export const useTelemetry = () => {
     // CRITICAL: This cleanup stops the "Laptop Fan" issue by 
     // closing old connections when the app reloads.
     return () => sse.close();
-  }, [setTelemetry]); // Only run once on mount
+  }, [setTelemetry, addNotification]); // Only run once on mount
 };
