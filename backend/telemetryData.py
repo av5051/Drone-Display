@@ -155,21 +155,24 @@ def land():
     return jsonify(ok=False, message="LAND mode not supported"), 400
 lat = 5 
 lon = 5
-gotoalt = 5
-@app.route("/goto")
+
+@app.route("/goto", methods = ["POST"])
 def goto():
+    global lat
+    global lon
+
     lat +=5
     lon +=5
-    gotoalt += 5
+
     if state['armed'] or state['mode'] != 'GUIDED':
         mav.mav.mission_item_send(
             mav.target_system, mav.target_component,
             0, mavutil.mavlink.MAV_FRAME_GLOBAL_RELATIVE_ALT,
             mavutil.mavlink.MAV_CMD_NAV_WAYPOINT,
             2, 0, 0, 0, 0, 0,lat
-            , lon, gotoalt
+            , lon, 10
         )
-        return jsonify(ok=True, message=f"Going to {lat}, {lon} at {gotoalt}m")
+        return jsonify(ok=True, message=f"Going to {lat}, {lon} at 10m")
     else:
 
         return jsonify(ok=False, message=f"check flying mode again , should be guided and armed")

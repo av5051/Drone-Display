@@ -44,6 +44,12 @@ export const FlightControls = () => {
       >
         LAND_NOW
       </button>
+      <button 
+        onClick={() => handleCommand('goto')}
+        className="bg-black border border-green-900/40 p-3 text-[10px] font-black text-green-500 hover:border-green-400"
+      >
+        flyHigh
+      </button>
     </div>
   );
 };
