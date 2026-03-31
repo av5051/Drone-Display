@@ -43,7 +43,10 @@ When you click a button in the UI:
 1. Navigate to the root folder.
 2. Install packages: `npm install`.
 3. Launch the dashboard: `npm run dev`.
-
+   
+**ardupilot(needs to be installed)**
+1. cd ardupilot/
+2. sim_vehicle.py -v ArduCopter --console --map
 ---
 
 ### Key Features
